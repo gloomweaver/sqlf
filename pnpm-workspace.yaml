@@ -5,6 +5,8 @@ packages:
   - tools/*
 
 catalog:
+  "@effect/platform": ^0.96.0
+  "@effect/platform-node": ^0.106.0
   "@effect/sql": ^0.51.0
   "@effect/sql-pg": ^0.52.1
   "@types/node": ^24

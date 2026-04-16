@@ -1,4 +1,5 @@
 node_modules
-generated
+generated/*
+!generated/index.ts
 *.log
 .DS_Store

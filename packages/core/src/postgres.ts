@@ -78,7 +78,15 @@ async function analyzeQuery(
   }
 
   const analysisSql = buildAnalysisSql(query);
-  const result = await client.query(analysisSql);
+
+  await client.query("BEGIN");
+  let result;
+
+  try {
+    result = await client.query(analysisSql);
+  } finally {
+    await client.query("ROLLBACK");
+  }
 
   const oids = unique(result.fields.map((field) => field.dataTypeID));
   const typeMap = await loadTypeInfo(client, oids);
@@ -123,10 +131,54 @@ function buildAnalysisSql(query: ParsedQuery): string {
       throw new Error(`Missing parameter for placeholder $${rawIndex} in ${query.name}`);
     }
 
-    return `NULL::${param.pgType}`;
+    return analysisPlaceholder(param.pgType);
   });
 
-  return `SELECT * FROM (${substituted}) AS __sqlf_analysis LIMIT 0`;
+  return `WITH __sqlf_analysis AS (${substituted}) SELECT * FROM __sqlf_analysis LIMIT 0`;
+}
+
+function analysisPlaceholder(pgType: string): string {
+  const lower = pgType.toLowerCase();
+
+  if (lower.endsWith("[]")) {
+    return `ARRAY[]::${pgType}`;
+  }
+
+  switch (lower) {
+    case "uuid":
+      return `'00000000-0000-0000-0000-000000000000'::${pgType}`;
+    case "text":
+    case "varchar":
+    case "bpchar":
+    case "char":
+    case "name":
+    case "citext":
+      return `''::${pgType}`;
+    case "bool":
+      return `FALSE::${pgType}`;
+    case "int2":
+    case "int4":
+    case "int8":
+    case "float4":
+    case "float8":
+    case "numeric":
+      return `0::${pgType}`;
+    case "date":
+      return `'1970-01-01'::${pgType}`;
+    case "time":
+      return `'00:00:00'::${pgType}`;
+    case "timetz":
+      return `'00:00:00+00'::${pgType}`;
+    case "timestamp":
+      return `'1970-01-01 00:00:00'::${pgType}`;
+    case "timestamptz":
+      return `'1970-01-01 00:00:00+00'::${pgType}`;
+    case "json":
+    case "jsonb":
+      return `'{}'::${pgType}`;
+    default:
+      return `NULL::${pgType}`;
+  }
 }
 
 async function loadTypeInfo(

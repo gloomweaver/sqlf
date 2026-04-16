@@ -6,9 +6,12 @@
   "scripts": {
     "db:start": "docker compose up -d --wait",
     "db:stop": "docker compose down -v",
-    "generate": "docker compose up -d --wait && node ../../packages/cli/dist/index.mjs generate --config ./sqlf.config.ts"
+    "generate": "docker compose up -d --wait && node ../../packages/cli/dist/index.mjs generate --config ./sqlf.config.ts",
+    "start": "docker compose up -d --wait && node --experimental-strip-types ./src/server.ts"
   },
   "dependencies": {
+    "@effect/platform": "catalog:",
+    "@effect/platform-node": "catalog:",
     "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
     "@sqlf/core": "workspace:*",
