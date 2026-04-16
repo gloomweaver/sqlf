@@ -70,6 +70,9 @@ importers:
         specifier: workspace:*
         version: link:../../packages/cli
     devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.12.2
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

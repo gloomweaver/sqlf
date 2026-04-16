@@ -16,7 +16,7 @@ vp lint
 vp run -r check
 vp run -r test
 vp run -r build
-node packages/cli/dist/index.mjs generate --config examples/basic/sqlf.config.ts
+vp run @sqlf/example-basic#generate
 ```
 
 ## Generated output
@@ -35,6 +35,21 @@ The generated module now emits:
 
 - `SQLF_TEST_DATABASE_URL`, if provided, or
 - an ephemeral Docker `postgres:16-alpine` container
+
+## Example
+
+`examples/basic` now includes a Docker Compose Postgres setup.
+
+```bash
+vp run -r build
+vp run @sqlf/example-basic#generate
+```
+
+That will:
+
+- start Postgres via `examples/basic/compose.yaml`
+- initialize the `users` table from `examples/basic/schema.sql`
+- generate `examples/basic/generated/index.ts`
 
 ## MVP scope
 

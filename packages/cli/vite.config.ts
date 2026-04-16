@@ -4,6 +4,10 @@ export default defineConfig({
   pack: {
     dts: true,
     exports: true,
+    deps: {
+      skipNodeModulesBundle: true,
+      neverBundle: ["@sqlf/core"],
+    },
   },
   lint: {
     options: {

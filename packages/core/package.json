@@ -4,9 +4,11 @@
   "description": "Core library for sqlf",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "type": "module",
+  "types": "./src/index.ts",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { generate } from "../../core/src/index.ts";
+import { generate } from "@sqlf/core";
 import { parseArgs, renderHelp } from "./args.js";
 
 async function main(): Promise<void> {
