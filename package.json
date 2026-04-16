@@ -1,6 +1,6 @@
 {
   "name": "effql-workspace",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "sqlc-style TypeScript code generation for Effect SQL using Postgres introspection",
   "keywords": [
@@ -9,7 +9,6 @@
     "effect-ts",
     "postgres",
     "sql",
-    "sqlc",
     "typescript"
   ],
   "homepage": "https://github.com/gloomweaver/effql#readme",

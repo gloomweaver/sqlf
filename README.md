@@ -1,31 +1,65 @@
 # effql
 
 [![CI](https://github.com/gloomweaver/effql/actions/workflows/ci.yml/badge.svg)](https://github.com/gloomweaver/effql/actions/workflows/ci.yml)
+[![npm: @effql/cli](https://img.shields.io/npm/v/%40effql%2Fcli?label=%40effql%2Fcli)](https://www.npmjs.com/package/@effql/cli)
+[![npm: @effql/core](https://img.shields.io/npm/v/%40effql%2Fcore?label=%40effql%2Fcore)](https://www.npmjs.com/package/@effql/core)
 
 `effql` is a `sqlc`-style TypeScript code generator for `effect` / `@effect/sql`.
 
 It keeps a SQL-first workflow, uses Postgres introspection to infer types, and emits Effect-native code built around `Schema` and `SqlSchema.*`.
 
-## Why effql
+## Packages
 
-- write raw SQL in `.sql` files
-- keep familiar query annotations like `-- name: GetUser :one`
-- use TypeScript / JavaScript config via `defineConfig()` instead of YAML
-- infer result shapes from a real Postgres database
-- generate executable Effect wrappers instead of plain DTOs
+- [`@effql/cli`](https://www.npmjs.com/package/@effql/cli) — CLI package providing the `effql` command
+- [`@effql/core`](https://www.npmjs.com/package/@effql/core) — config loading, SQL parsing, Postgres analysis, and code generation
 
-## Status
+## Installation
 
-This is an early **Postgres-only MVP**.
+```bash
+npm install -D @effql/cli @effql/core
+```
 
-What works today:
+```bash
+pnpm add -D @effql/cli @effql/core
+```
 
-- TS / JS config via `defineConfig()`
-- query annotations: `:one`, `:maybeOne`, `:many`, `:exec`
-- named params via `@param`
-- Postgres-backed type inference
-- generated `Schema` exports and `SqlSchema.single/findOne/findAll/void` wrappers
-- self-contained CRUD example with Docker Compose and an Effect HTTP API
+## CLI usage
+
+Bootstrap a project:
+
+```bash
+npx @effql/cli init
+npx @effql/cli init --config ./effql.config.ts
+```
+
+This creates:
+
+- `effql.config.ts`
+- `sql/queries.sql`
+- `package.json` if one does not already exist
+
+Installed locally:
+
+```bash
+npx effql init
+npx effql generate
+npx effql generate --config ./effql.config.ts
+```
+
+One-off without installing:
+
+```bash
+npx @effql/cli generate
+npx @effql/cli generate --config ./effql.config.ts
+```
+
+Also works with pnpm:
+
+```bash
+pnpm dlx @effql/cli generate
+```
+
+Yes — `npx` works because `@effql/cli` publishes the `effql` bin.
 
 ## Quick start
 
@@ -46,19 +80,6 @@ Or run the full smoke test used by CI:
 
 ```bash
 pnpm run example:smoke
-```
-
-## Workspace
-
-- `packages/core` — config loading, SQL parsing, Postgres analysis, code generation
-- `packages/cli` — `effql generate`
-- `examples/basic` — self-contained Postgres + generated CRUD module + Effect HTTP API
-
-## CLI
-
-```bash
-effql --help
-effql generate --config ./effql.config.ts
 ```
 
 ## Config
@@ -99,14 +120,11 @@ RETURNING id, email, created_at;
 SELECT id, email, created_at
 FROM users
 WHERE id = @id::uuid;
-
--- name: ListUsers :many
-SELECT id, email, created_at
-FROM users
-ORDER BY created_at DESC;
 ```
 
 ## Generated output shape
+
+Starter `sql/queries.sql` contains a simple `Healthcheck` query you can edit right away.
 
 Generated modules export:
 
@@ -115,8 +133,6 @@ Generated modules export:
 - `*Params` / `*Result` type aliases
 - raw `*Sql` strings
 - executable `SqlSchema.*` wrappers
-
-Example:
 
 ```ts
 export const CreateUserResultSchema = Schema.Struct({
@@ -135,58 +151,28 @@ export const createUser = SqlSchema.single({
 });
 ```
 
-## Direct usage example
+## Example project
 
-You can call generated functions by providing a SQL client layer:
+See `examples/basic` for the easiest end-to-end demo:
 
-```ts
-import { PgClient } from "@effect/sql-pg";
-import { Effect, Redacted } from "effect";
-import { createUser, listUsers } from "./generated/index.ts";
+- `compose.yaml` starts Postgres on `127.0.0.1:54329`
+- `schema.sql` creates and seeds `users`
+- `sql/queries.sql` defines CRUD queries
+- `generated/index.ts` is committed generated output
+- `src/httpApi.ts` and `src/server.ts` show runtime usage
 
-const program = Effect.gen(function* () {
-  const created = yield* createUser({
-    id: "33333333-3333-3333-3333-333333333333",
-    email: "grace@example.com",
-  });
+## Status
 
-  const users = yield* listUsers({});
+This is an early **Postgres-only MVP**.
 
-  return { created, users };
-});
+What works today:
 
-const runnable = program.pipe(
-  Effect.provide(
-    PgClient.layer({
-      url: Redacted.make("postgres://postgres:postgres@127.0.0.1:54329/postgres"),
-    }),
-  ),
-);
-```
-
-## Effect HTTP API example
-
-`examples/basic/src/httpApi.ts` wires generated CRUD queries into an Effect `HttpApi`.
-
-Routes:
-
-- `POST /users`
-- `GET /users`
-- `GET /users/:id`
-- `PUT /users/:id`
-- `DELETE /users/:id`
-
-Try it:
-
-```bash
-curl http://127.0.0.1:3000/users
-
-curl http://127.0.0.1:3000/users/11111111-1111-1111-1111-111111111111
-
-curl -X POST http://127.0.0.1:3000/users \
-  -H 'content-type: application/json' \
-  -d '{"email":"grace@example.com"}'
-```
+- TS / JS config via `defineConfig()`
+- query annotations: `:one`, `:maybeOne`, `:many`, `:exec`
+- named params via `@param`
+- Postgres-backed type inference
+- generated `Schema` exports and `SqlSchema.single/findOne/findAll/void` wrappers
+- self-contained CRUD example with Docker Compose and an Effect HTTP API
 
 ## Known limitations
 
@@ -199,26 +185,15 @@ Current MVP limitations:
 - output is currently a single generated module per target
 - API / config shape may still evolve before a stable release
 
-## Validation and CI
-
-Current checks cover:
-
-- formatting and linting
-- workspace typechecking
-- unit tests
-- Postgres integration tests
-- example generation smoke test in GitHub Actions
-- example API smoke test via `pnpm run example:smoke`
-
 ## Publishing
 
 A GitHub Actions release workflow publishes the npm packages when a GitHub release is marked as `published`.
 
 Before using it:
 
-- add an `NPM_TOKEN` repository secret
+- add an `NPM_TOKEN` repository secret if you keep token-based publishing
 - make sure you own/publish to both `@effql/cli` and `@effql/core` on npm
-- create releases with tags that match the package versions, for example `v0.1.0`
+- create releases with tags that match the package versions, for example `v0.1.1`
 
 The release workflow:
 
@@ -228,23 +203,13 @@ The release workflow:
 - publishes `@effql/core`
 - publishes `@effql/cli`
 
-## Example project
-
-See `examples/basic` for the easiest end-to-end demo:
-
-- `compose.yaml` starts Postgres on `127.0.0.1:54329`
-- `schema.sql` creates and seeds `users`
-- `sql/queries.sql` defines CRUD queries
-- `generated/index.ts` is committed generated output
-- `src/httpApi.ts` and `src/server.ts` show runtime usage
-
-## Development commands
+## Development
 
 ```bash
 vp install
 vp lint
-vp run -r check
-vp run -r test
+vp fmt
+vp test
 vp run -r build
 pnpm run example:smoke
 ```

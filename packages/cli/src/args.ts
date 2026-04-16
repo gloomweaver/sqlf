@@ -1,6 +1,7 @@
 export interface CliArgs {
-  readonly command: "generate" | "help";
+  readonly command: "generate" | "init" | "help";
   readonly configFile?: string;
+  readonly skipInstall?: boolean;
 }
 
 export function parseArgs(argv: readonly string[]): CliArgs {
@@ -11,11 +12,12 @@ export function parseArgs(argv: readonly string[]): CliArgs {
   }
 
   const command = args[0];
-  if (command !== "generate") {
+  if (command !== "generate" && command !== "init") {
     throw new Error(`Unknown command: ${command}\n\n${renderHelp()}`);
   }
 
   let configFile: string | undefined;
+  let skipInstall = false;
 
   for (let index = 1; index < args.length; index += 1) {
     const arg = args[index];
@@ -31,12 +33,22 @@ export function parseArgs(argv: readonly string[]): CliArgs {
       continue;
     }
 
+    if (arg === "--skip-install") {
+      if (command !== "init") {
+        throw new Error(`Unknown argument: ${arg}\n\n${renderHelp()}`);
+      }
+
+      skipInstall = true;
+      continue;
+    }
+
     throw new Error(`Unknown argument: ${arg}\n\n${renderHelp()}`);
   }
 
   return {
     command,
     configFile,
+    skipInstall,
   };
 }
 
@@ -45,14 +57,18 @@ export function renderHelp(): string {
     "effql - sqlc-style TypeScript code generation for Effect SQL",
     "",
     "Usage:",
+    "  effql init [--config <path>] [--skip-install]",
     "  effql generate [--config <path>]",
     "  effql help",
     "",
     "Options:",
     "  -c, --config <path>   Path to effql config file",
+    "      --skip-install    Write config without installing packages",
     "  -h, --help            Show help",
     "",
     "Examples:",
+    "  effql init",
+    "  effql init --config ./effql.config.ts",
     "  effql generate",
     "  effql generate --config ./effql.config.ts",
     "",
