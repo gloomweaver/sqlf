@@ -1,0 +1,31 @@
+packages:
+  - apps/*
+  - examples/*
+  - packages/*
+  - tools/*
+
+catalog:
+  "@effect/sql": ^0.51.0
+  "@effect/sql-pg": ^0.52.1
+  "@types/node": ^24
+  "@types/pg": ^8.20.0
+  effect: ^3.21.0
+  jiti: ^2.6.1
+  pg: ^8.20.0
+  tinyglobby: ^0.2.16
+  typescript: ^5.9.3
+  vite: npm:@voidzero-dev/vite-plus-core@latest
+  vite-plus: latest
+  vitest: npm:@voidzero-dev/vite-plus-test@latest
+
+catalogMode: prefer
+overrides:
+  vite: "catalog:"
+  vitest: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+    - vitest
+  allowedVersions:
+    vite: "*"
+    vitest: "*"

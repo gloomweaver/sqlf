@@ -1,0 +1,20 @@
+{
+  "name": "@sqlf/example-basic",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node ../../packages/cli/dist/index.mjs generate --config ./sqlf.config.ts"
+  },
+  "dependencies": {
+    "@effect/sql": "catalog:",
+    "@effect/sql-pg": "catalog:",
+    "@sqlf/core": "workspace:*",
+    "effect": "catalog:",
+    "pg": "catalog:",
+    "sqlf": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}
