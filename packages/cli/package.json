@@ -1,5 +1,5 @@
 {
-  "name": "effql",
+  "name": "@effql/cli",
   "version": "0.1.0",
   "description": "sqlc-style TypeScript code generation for Effect SQL using Postgres introspection",
   "keywords": [
@@ -31,6 +31,10 @@
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "build": "vp pack",

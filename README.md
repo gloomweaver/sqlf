@@ -210,6 +210,24 @@ Current checks cover:
 - example generation smoke test in GitHub Actions
 - example API smoke test via `pnpm run example:smoke`
 
+## Publishing
+
+A GitHub Actions release workflow publishes the npm packages when a GitHub release is marked as `published`.
+
+Before using it:
+
+- add an `NPM_TOKEN` repository secret
+- make sure you own/publish to both `@effql/cli` and `@effql/core` on npm
+- create releases with tags that match the package versions, for example `v0.1.0`
+
+The release workflow:
+
+- installs dependencies
+- verifies the release tag matches `packages/cli` and `packages/core` versions
+- builds, lints, formats, tests, and runs the example smoke test
+- publishes `@effql/core`
+- publishes `@effql/cli`
+
 ## Example project
 
 See `examples/basic` for the easiest end-to-end demo:

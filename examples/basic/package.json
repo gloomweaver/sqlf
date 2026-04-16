@@ -14,9 +14,9 @@
     "@effect/platform-node": "catalog:",
     "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
+    "@effql/cli": "workspace:*",
     "@effql/core": "workspace:*",
     "effect": "catalog:",
-    "effql": "workspace:*",
     "pg": "catalog:"
   },
   "devDependencies": {

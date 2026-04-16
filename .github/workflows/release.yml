@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1
+        with:
+          node-version: "22"
+          cache: true
+          run-install: false
+
+      - name: Configure npm auth
+        run: |
+          cat > ~/.npmrc <<'EOF'
+          //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+          registry=https://registry.npmjs.org/
+          always-auth=true
+          EOF
+
+      - name: Install dependencies
+        run: vp install --frozen-lockfile
+
+      - name: Verify release tag matches package versions
+        if: github.event_name == 'release'
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          CLI_VERSION=$(node -p "require('./packages/cli/package.json').version")
+          CORE_VERSION=$(node -p "require('./packages/core/package.json').version")
+
+          if [ "$VERSION" != "$CLI_VERSION" ]; then
+            echo "Release tag $TAG does not match packages/cli version $CLI_VERSION"
+            exit 1
+          fi
+
+          if [ "$VERSION" != "$CORE_VERSION" ]; then
+            echo "Release tag $TAG does not match packages/core version $CORE_VERSION"
+            exit 1
+          fi
+
+      - name: Build
+        run: vp run -r build
+
+      - name: Lint
+        run: vp lint
+
+      - name: Format check
+        run: vp fmt
+
+      - name: Test
+        run: vp test
+
+      - name: Example smoke test
+        run: EFFQL_SKIP_BUILD=1 vp run example:smoke
+
+      - name: Publish @effql/core
+        run: corepack pnpm --filter @effql/core publish --access public --no-git-checks --provenance
+
+      - name: Publish @effql/cli
+        run: corepack pnpm --filter @effql/cli publish --access public --no-git-checks --provenance
