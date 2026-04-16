@@ -25,17 +25,17 @@ jobs:
       - name: Install dependencies
         run: vp install --frozen-lockfile
 
+      - name: Build
+        run: vp run -r build
+
       - name: Lint
         run: vp lint
 
-      - name: Typecheck
-        run: vp run -r check
+      - name: Format check
+        run: vp fmt
 
       - name: Test
-        run: vp run -r test
-
-      - name: Build
-        run: vp run -r build
+        run: vp test
 
       - name: Example smoke test
         run: SQLF_SKIP_BUILD=1 vp run example:smoke
