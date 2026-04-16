@@ -1,12 +1,12 @@
 {
-  "name": "@sqlf/example-basic",
+  "name": "@effql/example-basic",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "db:start": "docker compose up -d --wait",
     "db:stop": "docker compose down -v",
-    "generate": "docker compose up -d --wait && node ../../packages/cli/dist/index.mjs generate --config ./sqlf.config.ts",
+    "generate": "docker compose up -d --wait && node ../../packages/cli/dist/index.mjs generate --config ./effql.config.ts",
     "start": "docker compose up -d --wait && node --experimental-strip-types ./src/server.ts"
   },
   "dependencies": {
@@ -14,10 +14,10 @@
     "@effect/platform-node": "catalog:",
     "@effect/sql": "catalog:",
     "@effect/sql-pg": "catalog:",
-    "@sqlf/core": "workspace:*",
+    "@effql/core": "workspace:*",
     "effect": "catalog:",
-    "pg": "catalog:",
-    "sqlf": "workspace:*"
+    "effql": "workspace:*",
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { generate } from "@sqlf/core";
+import { generate } from "@effql/core";
 import { parseArgs, renderHelp } from "./args.js";
 
 async function main(): Promise<void> {
@@ -20,6 +20,6 @@ async function main(): Promise<void> {
 
 main().catch((error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);
-  console.error(`sqlf: ${message}`);
+  console.error(`effql: ${message}`);
   process.exitCode = 1;
 });

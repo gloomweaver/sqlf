@@ -1,12 +1,12 @@
-# sqlf
+# effql
 
-[![CI](https://github.com/gloomweaver/sqlf/actions/workflows/ci.yml/badge.svg)](https://github.com/gloomweaver/sqlf/actions/workflows/ci.yml)
+[![CI](https://github.com/gloomweaver/effql/actions/workflows/ci.yml/badge.svg)](https://github.com/gloomweaver/effql/actions/workflows/ci.yml)
 
-`sqlf` is a `sqlc`-style TypeScript code generator for `effect` / `@effect/sql`.
+`effql` is a `sqlc`-style TypeScript code generator for `effect` / `@effect/sql`.
 
 It keeps a SQL-first workflow, uses Postgres introspection to infer types, and emits Effect-native code built around `Schema` and `SqlSchema.*`.
 
-## Why sqlf
+## Why effql
 
 - write raw SQL in `.sql` files
 - keep familiar query annotations like `-- name: GetUser :one`
@@ -33,13 +33,13 @@ Try the example in two commands:
 
 ```bash
 vp run -r build
-vp run @sqlf/example-basic#generate
+vp run @effql/example-basic#generate
 ```
 
 Then start the example API:
 
 ```bash
-vp run @sqlf/example-basic#start
+vp run @effql/example-basic#start
 ```
 
 Or run the full smoke test used by CI:
@@ -51,22 +51,22 @@ pnpm run example:smoke
 ## Workspace
 
 - `packages/core` — config loading, SQL parsing, Postgres analysis, code generation
-- `packages/cli` — `sqlf generate`
+- `packages/cli` — `effql generate`
 - `examples/basic` — self-contained Postgres + generated CRUD module + Effect HTTP API
 
 ## CLI
 
 ```bash
-sqlf --help
-sqlf generate --config ./sqlf.config.ts
+effql --help
+effql generate --config ./effql.config.ts
 ```
 
 ## Config
 
-`sqlf` uses code-based config:
+`effql` uses code-based config:
 
 ```ts
-import { defineConfig } from "@sqlf/core";
+import { defineConfig } from "@effql/core";
 
 export default defineConfig({
   dialect: "postgres",
@@ -80,12 +80,12 @@ export default defineConfig({
 
 Supported config filenames:
 
-- `sqlf.config.ts`
-- `sqlf.config.mts`
-- `sqlf.config.js`
-- `sqlf.config.mjs`
-- `sqlf.config.cts`
-- `sqlf.config.cjs`
+- `effql.config.ts`
+- `effql.config.mts`
+- `effql.config.js`
+- `effql.config.mjs`
+- `effql.config.cts`
+- `effql.config.cjs`
 
 ## SQL example
 

@@ -42,23 +42,23 @@ export function parseArgs(argv: readonly string[]): CliArgs {
 
 export function renderHelp(): string {
   return [
-    "sqlf - sqlc-style TypeScript code generation for Effect SQL",
+    "effql - sqlc-style TypeScript code generation for Effect SQL",
     "",
     "Usage:",
-    "  sqlf generate [--config <path>]",
-    "  sqlf help",
+    "  effql generate [--config <path>]",
+    "  effql help",
     "",
     "Options:",
-    "  -c, --config <path>   Path to sqlf config file",
+    "  -c, --config <path>   Path to effql config file",
     "  -h, --help            Show help",
     "",
     "Examples:",
-    "  sqlf generate",
-    "  sqlf generate --config ./sqlf.config.ts",
+    "  effql generate",
+    "  effql generate --config ./effql.config.ts",
     "",
     "Default config names:",
-    "  sqlf.config.ts, sqlf.config.mts, sqlf.config.js, sqlf.config.mjs,",
-    "  sqlf.config.cts, sqlf.config.cjs",
+    "  effql.config.ts, effql.config.mts, effql.config.js, effql.config.mjs,",
+    "  effql.config.cts, effql.config.cjs",
     "",
   ].join("\n");
 }

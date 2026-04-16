@@ -1,3 +1,3 @@
-# @sqlf/core
+# @effql/core
 
-Core implementation for the sqlf MVP.
+Core implementation for the effql MVP.

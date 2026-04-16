@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-import { defineConfig } from "@sqlf/core";
+import { defineConfig } from "@effql/core";
 
 export default defineConfig({
   dialect: "postgres",

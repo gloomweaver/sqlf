@@ -134,7 +134,7 @@ function buildAnalysisSql(query: ParsedQuery): string {
     return analysisPlaceholder(param.pgType);
   });
 
-  return `WITH __sqlf_analysis AS (${substituted}) SELECT * FROM __sqlf_analysis LIMIT 0`;
+  return `WITH __effql_analysis AS (${substituted}) SELECT * FROM __effql_analysis LIMIT 0`;
 }
 
 function analysisPlaceholder(pgType: string): string {

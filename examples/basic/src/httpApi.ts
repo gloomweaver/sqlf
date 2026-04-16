@@ -29,7 +29,7 @@ const UpdateUserPayloadSchema = Schema.Struct({
   email: Schema.String,
 });
 
-export const UsersApi = HttpApi.make("sqlf-example").add(
+export const UsersApi = HttpApi.make("effql-example").add(
   HttpApiGroup.make("users")
     .add(
       HttpApiEndpoint.post("createUser", "/users")

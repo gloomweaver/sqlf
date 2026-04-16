@@ -38,4 +38,4 @@ jobs:
         run: vp test
 
       - name: Example smoke test
-        run: SQLF_SKIP_BUILD=1 vp run example:smoke
+        run: EFFQL_SKIP_BUILD=1 vp run example:smoke

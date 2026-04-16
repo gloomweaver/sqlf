@@ -6,7 +6,7 @@ export default defineConfig({
     exports: true,
     deps: {
       skipNodeModulesBundle: true,
-      neverBundle: ["@sqlf/core"],
+      neverBundle: ["@effql/core"],
     },
   },
   lint: {

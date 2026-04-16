@@ -1,5 +1,5 @@
 {
-  "name": "sqlf-workspace",
+  "name": "effql-workspace",
   "version": "0.1.0",
   "private": true,
   "description": "sqlc-style TypeScript code generation for Effect SQL using Postgres introspection",
@@ -12,14 +12,14 @@
     "sqlc",
     "typescript"
   ],
-  "homepage": "https://github.com/gloomweaver/sqlf#readme",
+  "homepage": "https://github.com/gloomweaver/effql#readme",
   "bugs": {
-    "url": "https://github.com/gloomweaver/sqlf/issues"
+    "url": "https://github.com/gloomweaver/effql/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gloomweaver/sqlf.git"
+    "url": "git+https://github.com/gloomweaver/effql.git"
   },
   "type": "module",
   "scripts": {

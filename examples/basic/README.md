@@ -1,6 +1,6 @@
-# @sqlf/example-basic
+# @effql/example-basic
 
-Self-contained example for `sqlf`.
+Self-contained example for `effql`.
 
 ## What it contains
 

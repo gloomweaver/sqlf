@@ -69,18 +69,18 @@ importers:
       '@effect/sql-pg':
         specifier: 'catalog:'
         version: 0.52.1(@effect/experimental@0.60.0(@effect/platform@0.96.0(effect@3.21.0))(effect@3.21.0))(@effect/platform@0.96.0(effect@3.21.0))(@effect/sql@0.51.0(@effect/experimental@0.60.0(@effect/platform@0.96.0(effect@3.21.0))(effect@3.21.0))(@effect/platform@0.96.0(effect@3.21.0))(effect@3.21.0))(effect@3.21.0)
-      '@sqlf/core':
+      '@effql/core':
         specifier: workspace:*
         version: link:../../packages/core
       effect:
         specifier: 'catalog:'
         version: 3.21.0
+      effql:
+        specifier: workspace:*
+        version: link:../../packages/cli
       pg:
         specifier: 'catalog:'
         version: 8.20.0
-      sqlf:
-        specifier: workspace:*
-        version: link:../../packages/cli
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -91,7 +91,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@sqlf/core':
+      '@effql/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

@@ -22,11 +22,13 @@ interface PostgresFixture {
 test("analyzes postgres queries and generates effect/sql output", async () => {
   const fixture = await startPostgresFixture();
   if (fixture === undefined) {
-    console.warn("postgres integration test skipped: set SQLF_TEST_DATABASE_URL or install Docker");
+    console.warn(
+      "postgres integration test skipped: set EFFQL_TEST_DATABASE_URL or install Docker",
+    );
     return;
   }
 
-  const tempDir = await mkdtemp(join(tmpdir(), "sqlf-integration-"));
+  const tempDir = await mkdtemp(join(tmpdir(), "effql-integration-"));
 
   try {
     await fixture.client.query(`
@@ -73,7 +75,7 @@ WHERE id = @id::uuid;
 
     const config: ResolvedConfig = {
       rootDir: tempDir,
-      configFile: join(tempDir, "sqlf.config.ts"),
+      configFile: join(tempDir, "effql.config.ts"),
       dialect: "postgres",
       db: { url: fixture.url },
       queryPatterns: ["./queries.sql"],
@@ -170,7 +172,7 @@ WHERE id = @id::uuid;
 }, 60_000);
 
 async function startPostgresFixture(): Promise<PostgresFixture | undefined> {
-  const envUrl = process.env.SQLF_TEST_DATABASE_URL;
+  const envUrl = process.env.EFFQL_TEST_DATABASE_URL;
   if (envUrl !== undefined) {
     const client = new Client({ connectionString: envUrl });
     await client.connect();
@@ -188,7 +190,7 @@ async function startPostgresFixture(): Promise<PostgresFixture | undefined> {
     return undefined;
   }
 
-  const containerName = `sqlf-test-${randomUUID()}`;
+  const containerName = `effql-test-${randomUUID()}`;
   await execFileAsync("docker", [
     "run",
     "-d",

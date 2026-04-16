@@ -9,5 +9,5 @@
     "verbatimModuleSyntax": true,
     "types": ["node"]
   },
-  "include": ["sqlf.config.ts", "generated/**/*.ts", "src/**/*.ts"]
+  "include": ["effql.config.ts", "generated/**/*.ts", "src/**/*.ts"]
 }

@@ -4,12 +4,12 @@ import createJiti from "jiti";
 import type { ConfigEnv, ResolvedConfig, UserConfig, UserConfigExport } from "./types.js";
 
 const CONFIG_NAMES = [
-  "sqlf.config.ts",
-  "sqlf.config.mts",
-  "sqlf.config.js",
-  "sqlf.config.mjs",
-  "sqlf.config.cts",
-  "sqlf.config.cjs",
+  "effql.config.ts",
+  "effql.config.mts",
+  "effql.config.js",
+  "effql.config.mjs",
+  "effql.config.cts",
+  "effql.config.cjs",
 ] as const;
 
 export function defineConfig(config: UserConfigExport): UserConfigExport {
@@ -31,7 +31,7 @@ export async function loadConfig(
 
   if (configFile === undefined) {
     throw new Error(
-      `Could not find a sqlf config file in ${cwd}. Looked for: ${CONFIG_NAMES.join(", ")}`,
+      `Could not find an effql config file in ${cwd}. Looked for: ${CONFIG_NAMES.join(", ")}`,
     );
   }
 

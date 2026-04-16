@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 EXAMPLE_DIR="$ROOT_DIR/examples/basic"
-SERVER_LOG="${TMPDIR:-/tmp}/sqlf-example-smoke.log"
+SERVER_LOG="${TMPDIR:-/tmp}/effql-example-smoke.log"
 server_pid=""
 
 cleanup() {
@@ -22,7 +22,7 @@ cd "$ROOT_DIR"
 
 PNPM=(corepack pnpm)
 
-if [[ "${SQLF_SKIP_BUILD:-0}" != "1" ]]; then
+if [[ "${EFFQL_SKIP_BUILD:-0}" != "1" ]]; then
   "${PNPM[@]}" exec vp run -r build
 fi
 

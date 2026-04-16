@@ -1,7 +1,7 @@
 {
-  "name": "@sqlf/core",
+  "name": "@effql/core",
   "version": "0.1.0",
-  "description": "Core library for sqlf",
+  "description": "Core library for effql",
   "keywords": [
     "codegen",
     "effect-ts",
@@ -9,14 +9,14 @@
     "sql",
     "typescript"
   ],
-  "homepage": "https://github.com/gloomweaver/sqlf/tree/main/packages/core",
+  "homepage": "https://github.com/gloomweaver/effql/tree/main/packages/core",
   "bugs": {
-    "url": "https://github.com/gloomweaver/sqlf/issues"
+    "url": "https://github.com/gloomweaver/effql/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gloomweaver/sqlf.git",
+    "url": "git+https://github.com/gloomweaver/effql.git",
     "directory": "packages/core"
   },
   "files": [
