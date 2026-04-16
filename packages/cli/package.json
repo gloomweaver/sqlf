@@ -1,8 +1,25 @@
 {
   "name": "sqlf",
-  "version": "0.0.0",
-  "description": "CLI for sqlf",
+  "version": "0.1.0",
+  "description": "sqlc-style TypeScript code generation for Effect SQL using Postgres introspection",
+  "keywords": [
+    "codegen",
+    "effect-ts",
+    "postgres",
+    "sql",
+    "sqlc",
+    "typescript"
+  ],
+  "homepage": "https://github.com/gloomweaver/sqlf#readme",
+  "bugs": {
+    "url": "https://github.com/gloomweaver/sqlf/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gloomweaver/sqlf.git",
+    "directory": "packages/cli"
+  },
   "bin": {
     "sqlf": "./dist/index.mjs"
   },

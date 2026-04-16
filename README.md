@@ -1,74 +1,93 @@
 # sqlf
 
-`sqlf` is an MVP for a SQL-first TypeScript code generator targeting `effect` + `@effect/sql`.
+[![CI](https://github.com/gloomweaver/sqlf/actions/workflows/ci.yml/badge.svg)](https://github.com/gloomweaver/sqlf/actions/workflows/ci.yml)
 
-It is inspired by `sqlc`, but uses:
+`sqlf` is a `sqlc`-style TypeScript code generator for `effect` / `@effect/sql`.
 
-- TypeScript / JS config via `defineConfig()`
-- database introspection for result / parameter typing
-- generated `Schema` + `SqlSchema.*` helpers for Effect-native usage
+It keeps a SQL-first workflow, uses Postgres introspection to infer types, and emits Effect-native code built around `Schema` and `SqlSchema.*`.
 
-## Workspace
+## Why sqlf
 
-- `packages/core` — config loading, SQL parsing, Postgres analysis, code generation
-- `packages/cli` — `sqlf generate`
-- `examples/basic` — self-contained Postgres + generated CRUD example + Effect HTTP API
+- write raw SQL in `.sql` files
+- keep familiar query annotations like `-- name: GetUser :one`
+- use TypeScript / JavaScript config via `defineConfig()` instead of YAML
+- infer result shapes from a real Postgres database
+- generate executable Effect wrappers instead of plain DTOs
 
-## MVP scope
+## Status
 
-Current MVP supports:
+This is an early **Postgres-only MVP**.
 
-- JS / TS config via `defineConfig()`
-- Postgres-only
-- sqlc-style query annotations: `:one`, `:maybeOne`, `:many`, `:exec`
+What works today:
+
+- TS / JS config via `defineConfig()`
+- query annotations: `:one`, `:maybeOne`, `:many`, `:exec`
 - named params via `@param`
-- Postgres-backed result type inference
-- generated Effect SQL wrappers via `SqlSchema.single/findOne/findAll/void`
-
-## Commands
-
-```bash
-vp install
-vp lint
-vp run -r check
-vp run -r test
-vp run -r build
-```
+- Postgres-backed type inference
+- generated `Schema` exports and `SqlSchema.single/findOne/findAll/void` wrappers
+- self-contained CRUD example with Docker Compose and an Effect HTTP API
 
 ## Quick start
 
-Generate the example output:
+Try the example in two commands:
 
 ```bash
 vp run -r build
 vp run @sqlf/example-basic#generate
 ```
 
-Start the example API:
+Then start the example API:
 
 ```bash
 vp run @sqlf/example-basic#start
 ```
 
-Reset the example database if you want to re-run `schema.sql` from scratch:
+Or run the full smoke test used by CI:
 
 ```bash
-cd examples/basic
-pnpm run db:stop
-pnpm run db:start
+pnpm run example:smoke
 ```
 
-## Example: generated CRUD module
+## Workspace
 
-The basic example lives in `examples/basic` and is fully local:
+- `packages/core` — config loading, SQL parsing, Postgres analysis, code generation
+- `packages/cli` — `sqlf generate`
+- `examples/basic` — self-contained Postgres + generated CRUD module + Effect HTTP API
 
-- `examples/basic/compose.yaml` starts Postgres on `127.0.0.1:54329`
-- `examples/basic/schema.sql` creates and seeds the `users` table
-- `examples/basic/sql/queries.sql` defines CRUD queries
-- `examples/basic/generated/index.ts` is committed generated output
-- `examples/basic/src/httpApi.ts` shows how to use generated queries inside an Effect `HttpApi`
+## CLI
 
-The example SQL includes:
+```bash
+sqlf --help
+sqlf generate --config ./sqlf.config.ts
+```
+
+## Config
+
+`sqlf` uses code-based config:
+
+```ts
+import { defineConfig } from "@sqlf/core";
+
+export default defineConfig({
+  dialect: "postgres",
+  db: {
+    url: process.env.DATABASE_URL!,
+  },
+  queries: ["./sql/**/*.sql"],
+  outDir: "./generated",
+});
+```
+
+Supported config filenames:
+
+- `sqlf.config.ts`
+- `sqlf.config.mts`
+- `sqlf.config.js`
+- `sqlf.config.mjs`
+- `sqlf.config.cts`
+- `sqlf.config.cjs`
+
+## SQL example
 
 ```sql
 -- name: CreateUser :one
@@ -85,21 +104,40 @@ WHERE id = @id::uuid;
 SELECT id, email, created_at
 FROM users
 ORDER BY created_at DESC;
-
--- name: UpdateUser :one
-UPDATE users
-SET email = @email::text
-WHERE id = @id::uuid
-RETURNING id, email, created_at;
-
--- name: DeleteUser :exec
-DELETE FROM users
-WHERE id = @id::uuid;
 ```
 
-## Example: direct generated usage
+## Generated output shape
 
-You can call the generated functions directly by providing a SQL client layer:
+Generated modules export:
+
+- `*ParamsSchema`
+- `*ResultSchema`
+- `*Params` / `*Result` type aliases
+- raw `*Sql` strings
+- executable `SqlSchema.*` wrappers
+
+Example:
+
+```ts
+export const CreateUserResultSchema = Schema.Struct({
+  id: Schema.UUID,
+  email: Schema.String,
+  created_at: Schema.DateFromSelf,
+});
+
+export const createUser = SqlSchema.single({
+  Request: CreateUserParamsSchema,
+  Result: CreateUserResultSchema,
+  execute: (request) =>
+    Effect.flatMap(SqlClient.SqlClient, (sql) =>
+      sql.unsafe(createUserSql, [request.id, request.email]),
+    ),
+});
+```
+
+## Direct usage example
+
+You can call generated functions by providing a SQL client layer:
 
 ```ts
 import { PgClient } from "@effect/sql-pg";
@@ -126,40 +164,11 @@ const runnable = program.pipe(
 );
 ```
 
-## Example: generated output shape
+## Effect HTTP API example
 
-Generated modules export:
+`examples/basic/src/httpApi.ts` wires generated CRUD queries into an Effect `HttpApi`.
 
-- `*ParamsSchema`
-- `*ResultSchema`
-- `*Params` / `*Result` type aliases
-- raw `*Sql` strings
-- `SqlSchema.*` wrappers
-
-Example output from `examples/basic/generated/index.ts`:
-
-```ts
-export const CreateUserResultSchema = Schema.Struct({
-  id: Schema.UUID,
-  email: Schema.String,
-  created_at: Schema.DateFromSelf,
-});
-
-export const createUser = SqlSchema.single({
-  Request: CreateUserParamsSchema,
-  Result: CreateUserResultSchema,
-  execute: (request) =>
-    Effect.flatMap(SqlClient.SqlClient, (sql) =>
-      sql.unsafe(createUserSql, [request.id, request.email]),
-    ),
-});
-```
-
-## Example: Effect HTTP API
-
-`examples/basic/src/httpApi.ts` wires the generated module into an Effect `HttpApi`.
-
-It exposes:
+Routes:
 
 - `POST /users`
 - `GET /users`
@@ -167,13 +176,7 @@ It exposes:
 - `PUT /users/:id`
 - `DELETE /users/:id`
 
-Start it:
-
-```bash
-vp run @sqlf/example-basic#start
-```
-
-Then try it:
+Try it:
 
 ```bash
 curl http://127.0.0.1:3000/users
@@ -183,26 +186,47 @@ curl http://127.0.0.1:3000/users/11111111-1111-1111-1111-111111111111
 curl -X POST http://127.0.0.1:3000/users \
   -H 'content-type: application/json' \
   -d '{"email":"grace@example.com"}'
-
-curl -X PUT http://127.0.0.1:3000/users/11111111-1111-1111-1111-111111111111 \
-  -H 'content-type: application/json' \
-  -d '{"email":"ada+updated@example.com"}'
-
-curl -X DELETE http://127.0.0.1:3000/users/11111111-1111-1111-1111-111111111111
 ```
 
-## Generated output notes
+## Known limitations
 
-The generator currently emits:
+Current MVP limitations:
 
-- query doc comments with source file + SQL
-- Effect schemas for params and results
-- raw SQL strings
-- executable wrappers built on `SqlSchema`
+- Postgres only
+- generation requires a live database connection
+- named params currently work best with explicit casts, for example `@id::uuid`
+- nullability inference is intentionally conservative
+- output is currently a single generated module per target
+- API / config shape may still evolve before a stable release
 
-## Integration testing
+## Validation and CI
 
-`packages/core/tests/postgres.integration.test.ts` runs against either:
+Current checks cover:
 
-- `SQLF_TEST_DATABASE_URL`, or
-- an ephemeral Docker `postgres:16-alpine` container
+- formatting and linting
+- workspace typechecking
+- unit tests
+- Postgres integration tests
+- example generation smoke test in GitHub Actions
+- example API smoke test via `pnpm run example:smoke`
+
+## Example project
+
+See `examples/basic` for the easiest end-to-end demo:
+
+- `compose.yaml` starts Postgres on `127.0.0.1:54329`
+- `schema.sql` creates and seeds `users`
+- `sql/queries.sql` defines CRUD queries
+- `generated/index.ts` is committed generated output
+- `src/httpApi.ts` and `src/server.ts` show runtime usage
+
+## Development commands
+
+```bash
+vp install
+vp lint
+vp run -r check
+vp run -r test
+vp run -r build
+pnpm run example:smoke
+```

@@ -1,13 +1,33 @@
 {
   "name": "sqlf-workspace",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "description": "sqlc-style TypeScript code generation for Effect SQL using Postgres introspection",
+  "keywords": [
+    "codegen",
+    "dx",
+    "effect-ts",
+    "postgres",
+    "sql",
+    "sqlc",
+    "typescript"
+  ],
+  "homepage": "https://github.com/gloomweaver/sqlf#readme",
+  "bugs": {
+    "url": "https://github.com/gloomweaver/sqlf/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gloomweaver/sqlf.git"
+  },
   "type": "module",
   "scripts": {
     "build": "vp run -r build",
     "test": "vp run -r test",
     "check": "vp check && vp run -r test && vp run -r build",
-    "ready": "vp fmt && vp lint && vp run -r test && vp run -r build"
+    "ready": "vp fmt && vp lint && vp run -r test && vp run -r build",
+    "example:smoke": "bash ./scripts/smoke-example.sh"
   },
   "devDependencies": {
     "vite-plus": "catalog:"

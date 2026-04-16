@@ -43,7 +43,12 @@ test("analyzes postgres queries and generates effect/sql output", async () => {
     const queryFile = join(tempDir, "queries.sql");
     await writeFile(
       queryFile,
-      `-- name: GetUser :one
+      `-- name: CreateUser :one
+INSERT INTO users (id, email, bio, tags, created_at)
+VALUES (@id::uuid, @email::text, @bio::text, @tags::text[], now())
+RETURNING id, email, bio, tags, created_at;
+
+-- name: GetUser :one
 SELECT id, email, bio, tags, created_at
 FROM users
 WHERE id = @id::uuid;
@@ -52,6 +57,13 @@ WHERE id = @id::uuid;
 SELECT id, email, bio, tags, created_at
 FROM users
 ORDER BY created_at DESC;
+
+-- name: UpdateUser :one
+UPDATE users
+SET email = @email::text,
+    bio = @bio::text
+WHERE id = @id::uuid
+RETURNING id, email, bio, tags, created_at;
 
 -- name: DeleteUser :exec
 DELETE FROM users
@@ -74,8 +86,16 @@ WHERE id = @id::uuid;
     const analyzed = await analyzeQueries(config, queries);
     const result = await writeEffectModule(config, analyzed);
 
-    expect(analyzed).toHaveLength(3);
-    expect(analyzed[0]?.fields).toEqual([
+    expect(analyzed).toHaveLength(5);
+    expect(analyzed.map((query) => query.name)).toEqual([
+      "CreateUser",
+      "GetUser",
+      "ListUsers",
+      "UpdateUser",
+      "DeleteUser",
+    ]);
+
+    const userFields = [
       {
         name: "id",
         nullable: false,
@@ -111,10 +131,22 @@ WHERE id = @id::uuid;
         tsType: "Date",
         schema: "Schema.DateFromSelf",
       },
-    ]);
+    ];
+
+    expect(analyzed[0]?.fields).toEqual(userFields);
+    expect(analyzed[1]?.fields).toEqual(userFields);
+    expect(analyzed[2]?.fields).toEqual(userFields);
+    expect(analyzed[3]?.fields).toEqual(userFields);
+    expect(analyzed[4]?.fields).toEqual([]);
     expect(result.outFile).toBe(join(tempDir, "generated", "index.ts"));
 
     const output = await readFile(result.outFile, "utf8");
+    expect(output).toContain("export const CreateUserParamsSchema = Schema.Struct");
+    expect(output).toContain("export const CreateUserResultSchema = Schema.Struct");
+    expect(output).toContain("export const createUser = SqlSchema.single");
+    expect(output).toContain(
+      "sql.unsafe(createUserSql, [request.id, request.email, request.bio, request.tags])",
+    );
     expect(output).toContain("export const GetUserParamsSchema = Schema.Struct");
     expect(output).toContain(
       "export type GetUserParams = Schema.Schema.Type<typeof GetUserParamsSchema>;",
@@ -126,7 +158,11 @@ WHERE id = @id::uuid;
     expect(output).toContain("tags: Schema.Array(Schema.String)");
     expect(output).toContain("export const getUser = SqlSchema.single");
     expect(output).toContain("sql.unsafe(getUserSql, [request.id])");
+    expect(output).toContain("export const UpdateUserResultSchema = Schema.Struct");
+    expect(output).toContain("export const updateUser = SqlSchema.single");
+    expect(output).toContain("sql.unsafe(updateUserSql, [request.email, request.bio, request.id])");
     expect(output).toContain("Query: GetUser");
+    expect(output).toContain("Query: UpdateUser");
   } finally {
     await rm(tempDir, { recursive: true, force: true });
     await fixture.cleanup();

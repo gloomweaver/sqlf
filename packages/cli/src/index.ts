@@ -19,6 +19,7 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`sqlf: ${message}`);
   process.exitCode = 1;
 });

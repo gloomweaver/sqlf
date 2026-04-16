@@ -30,10 +30,9 @@ RETURNING id, email, created_at`;
 export const createUser = SqlSchema.single({
   Request: CreateUserParamsSchema,
   Result: CreateUserResultSchema,
-  execute: (request) =>
-    Effect.flatMap(SqlClient.SqlClient, (sql) =>
-      sql.unsafe(createUserSql, [request.id, request.email]),
-    ),
+  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) =>
+    sql.unsafe(createUserSql, [request.id, request.email])
+  ),
 });
 
 /**
@@ -62,8 +61,9 @@ WHERE id = $1::uuid`;
 export const getUser = SqlSchema.single({
   Request: GetUserParamsSchema,
   Result: GetUserResultSchema,
-  execute: (request) =>
-    Effect.flatMap(SqlClient.SqlClient, (sql) => sql.unsafe(getUserSql, [request.id])),
+  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) =>
+    sql.unsafe(getUserSql, [request.id])
+  ),
 });
 
 /**
@@ -90,7 +90,9 @@ ORDER BY created_at DESC`;
 export const listUsers = SqlSchema.findAll({
   Request: ListUsersParamsSchema,
   Result: ListUsersResultSchema,
-  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) => sql.unsafe(listUsersSql)),
+  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) =>
+    sql.unsafe(listUsersSql)
+  ),
 });
 
 /**
@@ -122,10 +124,9 @@ RETURNING id, email, created_at`;
 export const updateUser = SqlSchema.single({
   Request: UpdateUserParamsSchema,
   Result: UpdateUserResultSchema,
-  execute: (request) =>
-    Effect.flatMap(SqlClient.SqlClient, (sql) =>
-      sql.unsafe(updateUserSql, [request.email, request.id]),
-    ),
+  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) =>
+    sql.unsafe(updateUserSql, [request.email, request.id])
+  ),
 });
 
 /**
@@ -145,6 +146,7 @@ export const deleteUserSql = String.raw`DELETE FROM users
 WHERE id = $1::uuid`;
 export const deleteUser = SqlSchema.void({
   Request: DeleteUserParamsSchema,
-  execute: (request) =>
-    Effect.flatMap(SqlClient.SqlClient, (sql) => sql.unsafe(deleteUserSql, [request.id])),
+  execute: (request) => Effect.flatMap(SqlClient.SqlClient, (sql) =>
+    sql.unsafe(deleteUserSql, [request.id])
+  ),
 });

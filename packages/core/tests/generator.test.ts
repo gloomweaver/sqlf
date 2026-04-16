@@ -1,8 +1,9 @@
+import { readFile } from "node:fs/promises";
 import { expect, test } from "vite-plus/test";
 import { renderEffectModule } from "../src/generator.js";
 import type { AnalyzedQuery } from "../src/types.js";
 
-test("renders an effect/sql module", () => {
+test("renders an effect/sql module", async () => {
   const module = renderEffectModule([
     {
       name: "GetUser",
@@ -38,13 +39,10 @@ test("renders an effect/sql module", () => {
     } satisfies AnalyzedQuery,
   ]);
 
-  expect(module).toContain('import { Effect, Schema } from "effect";');
-  expect(module).toContain("export const GetUserParamsSchema = Schema.Struct");
-  expect(module).toContain(
-    "export type GetUserParams = Schema.Schema.Type<typeof GetUserParamsSchema>;",
+  const expected = await readFile(
+    new URL("./fixtures/effect-module.golden.txt", import.meta.url),
+    "utf8",
   );
-  expect(module).toContain("export const GetUserResultSchema = Schema.Struct");
-  expect(module).toContain("export const getUser = SqlSchema.single");
-  expect(module).toContain("sql.unsafe(getUserSql, [request.id])");
-  expect(module).toContain("Query: GetUser");
+
+  expect(module).toBe(expected);
 });

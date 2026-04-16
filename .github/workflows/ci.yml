@@ -38,3 +38,6 @@ jobs:
 
       - name: Build
         run: pnpm exec vp run -r build
+
+      - name: Example smoke test
+        run: SQLF_SKIP_BUILD=1 pnpm run example:smoke

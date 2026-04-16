@@ -1,8 +1,24 @@
 {
   "name": "@sqlf/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Core library for sqlf",
+  "keywords": [
+    "codegen",
+    "effect-ts",
+    "postgres",
+    "sql",
+    "typescript"
+  ],
+  "homepage": "https://github.com/gloomweaver/sqlf/tree/main/packages/core",
+  "bugs": {
+    "url": "https://github.com/gloomweaver/sqlf/issues"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gloomweaver/sqlf.git",
+    "directory": "packages/core"
+  },
   "files": [
     "dist",
     "src"
